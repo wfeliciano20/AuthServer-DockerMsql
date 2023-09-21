@@ -30,29 +30,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+                                    @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
         if(!StringUtils.hasText(authHeader) || !StringUtils.startsWithIgnoreCase(authHeader, "Bearer ")){
             filterChain.doFilter(request,response);
-            return;
         }
-        jwt = authHeader.substring(7);
-        log.debug("JWT - {}", jwt);
-        userEmail = jwtService.extractUserName(jwt);
-        if(StringUtils.hasText(userEmail) && SecurityContextHolder.getContext().getAuthentication() == null ){
-            UserDetails userDetails = userService.userDetailsService().loadUserByUsername(userEmail);
-            if(jwtService.isTokenValid(jwt,userDetails)){
-                log.debug("User - {}",userDetails);
-                SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,null,userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                securityContext.setAuthentication(authToken);
-                SecurityContextHolder.setContext(securityContext);
-;            }
+        else{
+            jwt = authHeader.substring(7);
+            log.debug("JWT - {}", jwt);
+            userEmail = jwtService.extractUserName(jwt);
+            if(StringUtils.hasText(userEmail) && SecurityContextHolder.getContext().getAuthentication() == null ){
+                UserDetails userDetails = userService.userDetailsService().loadUserByUsername(userEmail);
+                if(jwtService.isTokenValid(jwt,userDetails)){
+                    log.debug("User - {}",userDetails);
+                    SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,null,userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    securityContext.setAuthentication(authToken);
+                    SecurityContextHolder.setContext(securityContext);
+                }
+            }
+            filterChain.doFilter(request,response);
         }
-        filterChain.doFilter(request,response);
+
     }
 }

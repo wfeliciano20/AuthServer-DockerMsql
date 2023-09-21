@@ -6,6 +6,8 @@ import com.williamfeliciano.authserverdockermsql.dto.SignUpRequest;
 import com.williamfeliciano.authserverdockermsql.models.Role;
 import com.williamfeliciano.authserverdockermsql.models.User;
 import com.williamfeliciano.authserverdockermsql.repositories.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationService {
 
     private final UserRepository userRepository;
@@ -51,4 +54,22 @@ public class AuthenticationService {
         return JwtAuthenticationResponse.builder().token(jwt).refreshToken(refreshJwt).build();
     }
 
+    public JwtAuthenticationResponse refresh(HttpServletRequest request) {
+        try {
+            String authHeader = request.getHeader("Authorization");
+            String jwt = authHeader.substring(7);
+            String userEmail = jwtService.extractUserName(jwt);
+            var user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
+            if(jwtService.isTokenValid(jwt,user)){
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(),user.getPassword()));
+                var newAccessToken = jwtService.generateToken(user);
+                var newRefreshToken = jwtService.generateRefreshToken(user);
+                return JwtAuthenticationResponse.builder().token(newAccessToken).refreshToken(newRefreshToken).build();
+            }
+        }catch(Exception ex){
+            log.error(ex.getMessage());
+        }
+        return null;
+    }
 }
