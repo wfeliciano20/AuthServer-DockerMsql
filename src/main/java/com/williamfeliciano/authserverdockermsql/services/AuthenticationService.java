@@ -40,7 +40,9 @@ public class AuthenticationService {
         user = userService.save(user);
         var jwt = jwtService.generateToken(user);
         var refreshJwt = jwtService.generateRefreshToken(user);
-        return JwtAuthenticationResponse.builder().token(jwt).refreshToken(refreshJwt).build();
+        JwtAuthenticationResponse response = JwtAuthenticationResponse.builder().token(jwt).refreshToken(refreshJwt).build();
+        log.info("signup response, {}", response);
+        return response;
     }
 
 
@@ -51,7 +53,12 @@ public class AuthenticationService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
         var jwt = jwtService.generateToken(user);
         var refreshJwt = jwtService.generateRefreshToken(user);
-        return JwtAuthenticationResponse.builder().token(jwt).refreshToken(refreshJwt).build();
+        log.info("sign in token {}",jwt);
+        log.info("sign in refresh {}",refreshJwt);
+        JwtAuthenticationResponse response =JwtAuthenticationResponse.builder().token(jwt).refreshToken(refreshJwt).build();
+        log.info("signIn response, {}", response);
+        System.out.println(response);
+        return response;
     }
 
     public JwtAuthenticationResponse refresh(HttpServletRequest request) {
