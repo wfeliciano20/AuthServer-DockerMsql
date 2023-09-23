@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.williamfeliciano</groupId>
     <artifactId>AuthServer-DockerMsql</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
     <name>AuthServer-DockerMsql</name>
     <description>AuthServer-DockerMsql</description>
     <properties>

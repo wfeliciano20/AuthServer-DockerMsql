@@ -55,7 +55,9 @@ public class AuthenticationService {
         var refreshJwt = jwtService.generateRefreshToken(user);
         log.info("sign in token {}",jwt);
         log.info("sign in refresh {}",refreshJwt);
-        JwtAuthenticationResponse response =JwtAuthenticationResponse.builder().token(jwt).refreshToken(refreshJwt).build();
+        var response = new  JwtAuthenticationResponse();
+        response.setToken(jwt);
+        response.setRefreshToken(refreshJwt);
         log.info("signIn response, {}", response);
         System.out.println(response);
         return response;
