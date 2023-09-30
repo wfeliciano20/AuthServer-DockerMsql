@@ -1,10 +1,11 @@
 package com.williamfeliciano.authserverdockermsql.controllers;
 
 import com.williamfeliciano.authserverdockermsql.dto.JwtAuthenticationResponse;
+import com.williamfeliciano.authserverdockermsql.dto.RefreshRequest;
 import com.williamfeliciano.authserverdockermsql.dto.SignInRequest;
 import com.williamfeliciano.authserverdockermsql.dto.SignUpRequest;
 import com.williamfeliciano.authserverdockermsql.services.AuthenticationService;
-import jakarta.servlet.http.HttpServletRequest;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +29,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/refresh")
-    public JwtAuthenticationResponse refreshToken(HttpServletRequest request){
+    public JwtAuthenticationResponse refreshToken(@RequestBody RefreshRequest request){
         return authenticationService.refresh(request);
     }
 
